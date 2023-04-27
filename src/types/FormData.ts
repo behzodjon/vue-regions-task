@@ -1,5 +1,6 @@
-import Region from "./Region";
-import District from "./District";
+
+
+import { District, Region } from "./Location";
 
 export default interface FormData {
     region: Region | null;

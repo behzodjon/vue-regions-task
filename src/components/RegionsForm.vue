@@ -9,11 +9,11 @@
       >
         <!-- region form control -->
         <div class="relative flex flex-col w-full">
-          <label for="region" class="base-label">Viloyat</label>
+          <label for="regions" class="base-label">Viloyat</label>
           <select
-            id="region"
+            id="regions"
             v-model="row.region"
-            @change="onSelectChange(index)"
+            @change="fetchDistricts(index)"
             class="base-select"
           >
             <option v-for="region in regions" :key="region.id" :value="region">
@@ -64,9 +64,8 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
 import axios from "axios";
-import District from "../types/District";
-import Region from "../types/Region";
 import FormData from "../types/FormData";
+import { District, Region } from "../types/Location";
 
 const rows = ref<FormData[]>([{ region: null, district: null, comment: "" }]);
 
@@ -78,7 +77,7 @@ const filteredDistricts = computed(() => {
   return (index: number) => {
     const selectedDistrictIds = rows.value
       .flatMap((item) => item.district?.id ?? [])
-      .filter((r) => r !== rows.value[index].district?.id);
+      .filter((d) => d !== rows.value[index].district?.id);
 
     return districts.value[index]?.filter(
       (r) => !selectedDistrictIds.includes(r.id)
@@ -94,7 +93,7 @@ const removeRow = (index: number) => {
   rows.value.splice(index, 1);
 };
 
-const fetchData = async () => {
+const fetchRegions = async () => {
   try {
     const response = await axios.get("https://robocontest.uz/api/regions");
     regions.value = response.data;
@@ -103,7 +102,7 @@ const fetchData = async () => {
   }
 };
 
-const onSelectChange = async (index: number) => {
+const fetchDistricts = async (index: number) => {
   const regionId = rows.value[index].region?.id;
   try {
     const response = await axios.get(
@@ -115,5 +114,5 @@ const onSelectChange = async (index: number) => {
   }
 };
 
-onMounted(fetchData);
+onMounted(fetchRegions);
 </script>
