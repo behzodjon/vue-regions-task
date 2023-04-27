@@ -7,35 +7,31 @@
         :key="index"
         class="flex items-center w-full gap-4 mb-12"
       >
-        <!-- province form control -->
+        <!-- region form control -->
         <div class="relative flex flex-col w-full">
-          <label for="province" class="base-label">Viloyat</label>
+          <label for="region" class="base-label">Viloyat</label>
           <select
-            id="province"
-            v-model="row.province"
+            id="region"
+            v-model="row.region"
             @change="onSelectChange(index)"
             class="base-select"
           >
-            <option
-              v-for="province in provinces"
-              :key="province.id"
-              :value="province"
-            >
-              {{ province.name }}
+            <option v-for="region in regions" :key="region.id" :value="region">
+              {{ region.name }}
             </option>
           </select>
         </div>
 
-        <!-- regions form control -->
+        <!-- districts form control -->
         <div class="relative flex flex-col w-full">
-          <label for="regions" class="base-label">Tuman</label>
-          <select v-model="row.region" id="regions" class="base-select">
+          <label for="districts" class="base-label">Tuman</label>
+          <select v-model="row.district" id="districts" class="base-select">
             <option
-              v-for="(region, regionIndex) in filteredRegions(index)"
-              :key="regionIndex"
-              :value="region"
+              v-for="(district, districtIndex) in filteredDistricts(index)"
+              :key="districtIndex"
+              :value="district"
             >
-              {{ region.name }}
+              {{ district.name }}
             </option>
           </select>
         </div>
@@ -68,30 +64,30 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
 import axios from "axios";
+import District from "../types/District";
 import Region from "../types/Region";
-import Province from "../types/Province";
 import FormData from "../types/FormData";
 
-const rows = ref<FormData[]>([{ province: null, region: null, comment: "" }]);
+const rows = ref<FormData[]>([{ region: null, district: null, comment: "" }]);
 
-const provinces = ref<Province[]>([]);
-const regions = ref<Region[][]>([]);
+const regions = ref<Region[]>([]);
+const districts = ref<District[][]>([]);
 const error = ref<unknown>(null);
 
-const filteredRegions = computed(() => {
+const filteredDistricts = computed(() => {
   return (index: number) => {
-    const selectedRegionIds = rows.value
-      .flatMap((item) => item.region?.id ?? [])
-      .filter((r) => r !== rows.value[index].region?.id);
+    const selectedDistrictIds = rows.value
+      .flatMap((item) => item.district?.id ?? [])
+      .filter((r) => r !== rows.value[index].district?.id);
 
-    return regions.value[index]?.filter(
-      (r) => !selectedRegionIds.includes(r.id)
+    return districts.value[index]?.filter(
+      (r) => !selectedDistrictIds.includes(r.id)
     );
   };
 });
 
 const addRow = () => {
-  rows.value.push({ province: null, region: null, comment: "" });
+  rows.value.push({ region: null, district: null, comment: "" });
 };
 
 const removeRow = (index: number) => {
@@ -101,19 +97,19 @@ const removeRow = (index: number) => {
 const fetchData = async () => {
   try {
     const response = await axios.get("https://robocontest.uz/api/regions");
-    provinces.value = response.data;
+    regions.value = response.data;
   } catch (err) {
     error.value = err;
   }
 };
 
 const onSelectChange = async (index: number) => {
-  const provinceId = rows.value[index].province?.id;
+  const regionId = rows.value[index].region?.id;
   try {
     const response = await axios.get(
-      `https://robocontest.uz/api/regions?q=${provinceId}`
+      `https://robocontest.uz/api/regions?q=${regionId}`
     );
-    regions.value[index] = response.data;
+    districts.value[index] = response.data;
   } catch (err) {
     error.value = err;
   }

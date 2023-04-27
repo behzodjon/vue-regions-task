@@ -1,8 +1,8 @@
-import Province from "./Province";
 import Region from "./Region";
+import District from "./District";
 
 export default interface FormData {
-    province: Province | null;
     region: Region | null;
+    district: District | null;
     comment: string;
 }
