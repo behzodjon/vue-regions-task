@@ -1,11 +1,13 @@
 <template>
   <div class="w-full">
+    <!-- form container -->
     <form>
       <div
         v-for="(row, index) in rows"
         :key="index"
         class="flex items-center w-full gap-4 mb-12"
       >
+        <!-- province form control -->
         <div class="relative flex flex-col w-full">
           <label for="province" class="base-label">Viloyat</label>
           <select
@@ -23,6 +25,8 @@
             </option>
           </select>
         </div>
+
+        <!-- regions form control -->
         <div class="relative flex flex-col w-full">
           <label for="regions" class="base-label">Tuman</label>
           <select v-model="row.region" id="regions" class="base-select">
@@ -35,6 +39,8 @@
             </option>
           </select>
         </div>
+
+        <!-- comments form control -->
         <div class="relative flex flex-col w-full">
           <label for="comment" class="base-label">Comment</label>
           <input
@@ -45,12 +51,15 @@
             placeholder="Enter comment"
           />
         </div>
+
+        <!-- actions button -->
         <div class="relative flex flex-col mt-[30px]">
           <button @click.prevent="removeRow(index)" class="btn-danger">
             Delete
           </button>
         </div>
       </div>
+
       <button @click.prevent="addRow" class="btn-primary">Add+</button>
     </form>
   </div>
@@ -68,24 +77,21 @@ const rows = ref<FormData[]>([{ province: null, region: null, comment: "" }]);
 const provinces = ref<Province[]>([]);
 const regions = ref<Region[][]>([]);
 const error = ref<unknown>(null);
-const selectedRegions = ref<number[]>([]);
 
 const filteredRegions = computed(() => {
   return (index: number) => {
-    let selectedRegionsIds = selectedRegions.value.filter(
-      (r) => r !== rows.value[index].region?.id
-    );
+    const selectedRegionIds = rows.value
+      .flatMap((item) => item.region?.id ?? [])
+      .filter((r) => r !== rows.value[index].region?.id);
+
     return regions.value[index]?.filter(
-      (r) => !selectedRegionsIds.includes(r.id)
+      (r) => !selectedRegionIds.includes(r.id)
     );
   };
 });
 
 const addRow = () => {
   rows.value.push({ province: null, region: null, comment: "" });
-  selectedRegions.value = rows.value.flatMap((item) =>
-    typeof item.region?.id === "number" ? [item.region.id] : []
-  );
 };
 
 const removeRow = (index: number) => {
